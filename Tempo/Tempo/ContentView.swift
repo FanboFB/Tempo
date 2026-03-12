@@ -1,33 +1,27 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var timerManager = TimerManager()
-    @AppStorage("selectedTab") private var selectedTab = 0
-    @State private var sidebarVisible = true
+    @EnvironmentObject var timerManager: TimerManager
+    
+    @State private var selectedTab: Int = 0
+    
+    private var settings: SettingsStore {
+        SettingsStore.shared
+    }
+    
+    private var accentColor: Color {
+        Color(settings.themeColor)
+    }
     
     var body: some View {
         NavigationView {
-            if sidebarVisible {
-                SidebarView(selectedTab: $selectedTab, sidebarVisible: $sidebarVisible)
-                    .frame(minWidth: 180, idealWidth: 200, maxWidth: 220)
-                    .transition(.move(edge: .leading))
-            }
+            SidebarView(selectedTab: $selectedTab)
+                .frame(minWidth: 180, idealWidth: 200, maxWidth: 220)
             
             mainContentView
         }
-        .toolbar {
-            ToolbarItem(placement: .navigation) {
-                Button(action: toggleSidebar) {
-                    Image(systemName: sidebarVisible ? "sidebar.left" : "sidebar.right")
-                }
-            }
-        }
         .navigationTitle("Tempo")
         .accentColor(.blue)
-        .onReceive(NotificationCenter.default.publisher(for: .timerDataReset)) { _ in
-            // When reset notification is received, reset the TimerManager
-            timerManager.resetAllData()
-        }
     }
     
     @ViewBuilder
@@ -41,9 +35,11 @@ struct ContentView: View {
                 case 0:
                     TimerView(timerManager: timerManager)
                 case 1:
-                    StatsView()
+                    StatsView(timerManager: timerManager)
                 case 2:
-                    SettingsView() // No parameter needed
+                    SettingsView(timerManager: timerManager, onResetSettings: resetSettings)
+                case 3:
+                    HelpView()
                 default:
                     TimerView(timerManager: timerManager)
                 }
@@ -52,14 +48,18 @@ struct ContentView: View {
         }
     }
     
-    private func toggleSidebar() {
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-            sidebarVisible.toggle()
-        }
+    private func resetSettings() {
+        settings.focusDuration = 25
+        settings.shortBreakDuration = 5
+        settings.longBreakDuration = 15
+        settings.autoStartBreaks = true
+        settings.autoStartFocus = false
+        settings.enableNotifications = true
+        settings.enableSounds = true
+        settings.themeColor = "red"
     }
 }
 
-// Extension for notification name
 extension Notification.Name {
     static let timerDataReset = Notification.Name("timerDataReset")
 }

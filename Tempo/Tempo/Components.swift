@@ -10,7 +10,6 @@ struct StatCard: View {
     let icon: String
     let color: Color
     let animationDelay: Double
-    
     @State private var appear = false
     
     var body: some View {
@@ -135,11 +134,13 @@ struct ControlButton: View {
 struct SettingsSection<Content: View>: View {
     let title: String
     let icon: String
+    var accentColor: Color = .blue
     let content: Content
     
-    init(title: String, icon: String, @ViewBuilder content: () -> Content) {
+    init(title: String, icon: String, accentColor: Color = .blue, @ViewBuilder content: () -> Content) {
         self.title = title
         self.icon = icon
+        self.accentColor = accentColor
         self.content = content()
     }
     
@@ -148,7 +149,7 @@ struct SettingsSection<Content: View>: View {
             HStack(spacing: 10) {
                 Image(systemName: icon)
                     .font(.system(size: 14))
-                    .foregroundColor(.blue)
+                    .foregroundColor(accentColor)
                 Text(title)
                     .font(.headline)
                 Spacer()
@@ -171,6 +172,7 @@ struct DurationSlider: View {
     let icon: String
     let range: ClosedRange<Int>
     let suffix: String
+    var accentColor: Color = .blue
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -180,7 +182,7 @@ struct DurationSlider: View {
                 Spacer()
                 Text("\(value) \(suffix)")
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.blue)
+                    .foregroundColor(accentColor)
                     .monospacedDigit()
             }
             
@@ -192,6 +194,7 @@ struct DurationSlider: View {
                 in: Double(range.lowerBound)...Double(range.upperBound),
                 step: 1
             )
+            .tint(accentColor)
         }
     }
 }
@@ -200,6 +203,7 @@ struct ToggleRow: View {
     let icon: String
     let label: String
     @Binding var isOn: Bool
+    var accentColor: Color = .blue
     
     var body: some View {
         Toggle(isOn: $isOn) {
@@ -210,7 +214,7 @@ struct ToggleRow: View {
                 Spacer()
             }
         }
-        .toggleStyle(SwitchToggleStyle())
+        .toggleStyle(SwitchToggleStyle(tint: accentColor))
     }
 }
 
@@ -247,19 +251,5 @@ struct ThemeColorButton: View {
         }
         .buttonStyle(PlainButtonStyle())
         .frame(maxWidth: .infinity)
-    }
-}
-
-// MARK: - Theme Color Extension
-extension String {
-    var color: Color {
-        switch self {
-        case "blue": return .blue
-        case "green": return .green
-        case "orange": return .orange
-        case "purple": return .purple
-        case "red": return .red
-        default: return .blue
-        }
     }
 }

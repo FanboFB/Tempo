@@ -1,25 +1,30 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @ObservedObject var timerManager: TimerManager
+    var onResetSettings: (() -> Void)?
+    
     @AppStorage("focusDuration") private var focusDuration = 25
     @AppStorage("shortBreakDuration") private var shortBreakDuration = 5
     @AppStorage("longBreakDuration") private var longBreakDuration = 15
     
-    // Behavior settings
     @AppStorage("autoStartBreaks") private var autoStartBreaks = true
     @AppStorage("autoStartFocus") private var autoStartFocus = false
     @AppStorage("enableNotifications") private var enableNotifications = true
     @AppStorage("enableSounds") private var enableSounds = true
     
-    // Appearance
     @AppStorage("themeColor") private var themeColor = "red"
     
-    // Statistics data (for resetting)
-    @AppStorage("totalFocusTime") private var totalFocusTime: Double = 0
-    @AppStorage("totalSessions") private var totalSessions: Int = 0
-    @AppStorage("todaySessions") private var todaySessions: Int = 0
-    @AppStorage("lastSessionDate") private var lastSessionDate: String = ""
-    @AppStorage("weeklyData") private var weeklyDataJSON: String = "[]"
+    private var accentColor: Color {
+        switch themeColor {
+        case "red": return .red
+        case "blue": return .blue
+        case "green": return .green
+        case "orange": return .orange
+        case "purple": return .purple
+        default: return .red
+        }
+    }
     
     let themeColors = [
         ("red", "Red", Color.red),
@@ -39,20 +44,21 @@ struct SettingsView: View {
                     Text("Settings")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                    Text("Customize your Tempo experience")
+                    Text("Customize Tempo")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 .padding(.top, 20)
                 
                 // Timer Settings
-                SettingsSection(title: "Timer Settings", icon: "timer") {
+                SettingsSection(title: "Timer Settings", icon: "timer", accentColor: accentColor) {
                     DurationSlider(
                         value: $focusDuration,
                         label: "Focus Duration",
                         icon: "brain.head.profile",
                         range: 5...60,
-                        suffix: "min"
+                        suffix: "min",
+                        accentColor: accentColor
                     )
                     
                     DurationSlider(
@@ -60,7 +66,8 @@ struct SettingsView: View {
                         label: "Short Break",
                         icon: "cup.and.saucer",
                         range: 1...15,
-                        suffix: "min"
+                        suffix: "min",
+                        accentColor: accentColor
                     )
                     
                     DurationSlider(
@@ -68,42 +75,47 @@ struct SettingsView: View {
                         label: "Long Break",
                         icon: "bed.double.fill",
                         range: 5...30,
-                        suffix: "min"
+                        suffix: "min",
+                        accentColor: accentColor
                     )
                 }
                 
                 // Behavior
-                SettingsSection(title: "Behavior", icon: "arrow.triangle.2.circlepath") {
+                SettingsSection(title: "Behavior", icon: "arrow.triangle.2.circlepath", accentColor: accentColor) {
                     ToggleRow(
                         icon: "play.circle.fill",
                         label: "Auto-start breaks",
-                        isOn: $autoStartBreaks
+                        isOn: $autoStartBreaks,
+                        accentColor: accentColor
                     )
                     
                     ToggleRow(
                         icon: "pause.circle.fill",
                         label: "Auto-start focus sessions",
-                        isOn: $autoStartFocus
+                        isOn: $autoStartFocus,
+                        accentColor: accentColor
                     )
                 }
                 
                 // Notifications & Sounds
-                SettingsSection(title: "Notifications & Sounds", icon: "bell.badge.fill") {
+                SettingsSection(title: "Notifications & Sounds", icon: "bell.badge.fill", accentColor: accentColor) {
                     ToggleRow(
                         icon: "bell.fill",
                         label: "Enable notifications",
-                        isOn: $enableNotifications
+                        isOn: $enableNotifications,
+                        accentColor: accentColor
                     )
                     
                     ToggleRow(
                         icon: "speaker.wave.2.fill",
                         label: "Enable sounds",
-                        isOn: $enableSounds
+                        isOn: $enableSounds,
+                        accentColor: accentColor
                     )
                 }
                 
                 // Appearance
-                SettingsSection(title: "Appearance", icon: "paintbrush.fill") {
+                SettingsSection(title: "Appearance", icon: "paintbrush.fill", accentColor: accentColor) {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Theme Color")
                             .font(.system(size: 14, weight: .medium))
@@ -134,7 +146,7 @@ struct SettingsView: View {
                 }
                 
                 // Reset & About
-                SettingsSection(title: "About", icon: "info.circle.fill") {
+                SettingsSection(title: "About", icon: "info.circle.fill", accentColor: accentColor) {
                     VStack(spacing: 16) {
                         Button(action: {
                             showingResetConfirmation = true
@@ -154,7 +166,7 @@ struct SettingsView: View {
                         .buttonStyle(PlainButtonStyle())
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Tempo v1.0.2")
+                            Text("Tempo v1.2.0")
                                 .font(.caption)
                                 .fontWeight(.medium)
                         }
@@ -180,24 +192,7 @@ struct SettingsView: View {
     }
     
     private func resetAllData() {
-            // Reset all @AppStorage values
-            totalFocusTime = 0
-            totalSessions = 0
-            todaySessions = 0
-            lastSessionDate = ""
-            weeklyDataJSON = "[]"
-            
-            // Reset settings to defaults
-            focusDuration = 25
-            shortBreakDuration = 5
-            longBreakDuration = 15
-            autoStartBreaks = true
-            autoStartFocus = false
-            enableNotifications = true
-            enableSounds = true
-            themeColor = "red"
-            
-            // Post a notification that data was reset
-            NotificationCenter.default.post(name: .timerDataReset, object: nil)
+            timerManager.resetAllData()
+            onResetSettings?()
         }
 }

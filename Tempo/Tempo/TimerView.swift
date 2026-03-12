@@ -3,7 +3,7 @@ import UserNotifications
 
 struct TimerView: View {
     @ObservedObject var timerManager: TimerManager
-    @AppStorage("themeColor") private var themeColor = "red"
+    @AppStorage("themeColor") private var themeColorValue = "red"
     @AppStorage("focusDuration") private var focusDuration = 25
     @AppStorage("shortBreakDuration") private var shortBreakDuration = 5
     @AppStorage("longBreakDuration") private var longBreakDuration = 15
@@ -13,12 +13,31 @@ struct TimerView: View {
     @State private var showModeTransition = false
     @State private var timerPulse = false
     @State private var ringPulse = false
+    @State private var showingSessionPicker = false
+    
+    private var settings: SettingsStore { SettingsStore.shared }
+    
+    // Convert theme color string to SwiftUI Color
+    private var accentColor: Color {
+        switch themeColorValue {
+        case "red": return .red
+        case "blue": return .blue
+        case "green": return .green
+        case "orange": return .orange
+        case "purple": return .purple
+        default: return .red
+        }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
+            // Session selector
+            sessionSelector
+                .padding(.top, 20)
+            
             // Mode header with transition animation
             modeHeader
-                .padding(.top, 40)
+                .padding(.top, 20)
                 .padding(.bottom, 30)
             
             // Timer circle with enhanced animations
@@ -41,10 +60,10 @@ struct TimerView: View {
             Color(.windowBackgroundColor)
                 .ignoresSafeArea()
         )
-        .onChange(of: timerManager.mode) { _ in
+        .onChange(of: timerManager.mode) { _, _ in
             playModeTransitionAnimation()
         }
-        .onChange(of: timerManager.state) { newState in
+        .onChange(of: timerManager.state) { _, newState in
             if newState == .running {
                 startTimerAnimations()
             } else {
@@ -52,13 +71,13 @@ struct TimerView: View {
             }
         }
         // Update timer when settings change
-        .onChange(of: focusDuration) { _ in
+        .onChange(of: focusDuration) { _, _ in
             timerManager.updateTimerDuration()
         }
-        .onChange(of: shortBreakDuration) { _ in
+        .onChange(of: shortBreakDuration) { _, _ in
             timerManager.updateTimerDuration()
         }
-        .onChange(of: longBreakDuration) { _ in
+        .onChange(of: longBreakDuration) { _, _ in
             timerManager.updateTimerDuration()
         }
         .onAppear {
@@ -69,11 +88,52 @@ struct TimerView: View {
         }
     }
     
+    private var sessionSelector: some View {
+        Menu {
+            ForEach(timerManager.availableSessions) { session in
+                Button(action: {
+                    timerManager.setSession(session)
+                }) {
+                    HStack {
+                        Circle()
+                            .fill(session.colorHex.themeColor)
+                            .frame(width: 10, height: 10)
+                        Text(session.name)
+                        if timerManager.currentSessionName == session.name {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+            
+            Divider()
+            
+            Button("Custom...") {
+                showingSessionPicker = true
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(accentColor)
+                    .frame(width: 8, height: 8)
+                Text(timerManager.currentSessionName.isEmpty ? "Select Session" : timerManager.currentSessionName)
+                    .font(.system(size: 12, weight: .medium))
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(12)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
     private var modeHeader: some View {
         VStack(spacing: 8) {
             Text(timerManager.mode.rawValue.uppercased())
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(themeColor.color.opacity(0.7))
+                .foregroundColor(accentColor.opacity(0.7))
                 .tracking(1.5)
                 .scaleEffect(showModeTransition ? 1.2 : 1)
                 .opacity(showModeTransition ? 0 : 1)
@@ -93,7 +153,7 @@ struct TimerView: View {
                 .onAppear {
                     pulsate = timerManager.state == .running
                 }
-                .onChange(of: timerManager.state) { newState in
+                .onChange(of: timerManager.state) { _, newState in
                     pulsate = newState == .running
                 }
         }
@@ -104,7 +164,7 @@ struct TimerView: View {
             // Outer glow effect when timer is running
             if timerManager.state == .running {
                 Circle()
-                    .fill(themeColor.color.opacity(0.15))
+                    .fill(accentColor.opacity(0.15))
                     .frame(width: 320, height: 320)
                     .scaleEffect(timerPulse ? 1.05 : 1)
                     .opacity(timerPulse ? 1 : 0.7)
@@ -119,7 +179,7 @@ struct TimerView: View {
             ForEach(0..<3) { i in
                 Circle()
                     .stroke(
-                        themeColor.color.opacity(0.1),
+                        accentColor.opacity(0.1),
                         style: StrokeStyle(lineWidth: 2, dash: [2, 4])
                     )
                     .frame(width: 280 + CGFloat(i * 20), height: 280 + CGFloat(i * 20))
@@ -129,7 +189,7 @@ struct TimerView: View {
             // Pulsing progress ring background
             Circle()
                 .stroke(
-                    themeColor.color.opacity(0.2),
+                    accentColor.opacity(0.2),
                     style: StrokeStyle(lineWidth: 12, lineCap: .round)
                 )
                 .frame(width: 280, height: 280)
@@ -147,8 +207,8 @@ struct TimerView: View {
                 .stroke(
                     LinearGradient(
                         gradient: Gradient(colors: [
-                            themeColor.color,
-                            themeColor.color.opacity(0.7)
+                            accentColor,
+                            accentColor.opacity(0.7)
                         ]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -158,7 +218,7 @@ struct TimerView: View {
                 .frame(width: 280, height: 280)
                 .rotationEffect(.degrees(-90))
                 .shadow(
-                    color: themeColor.color.opacity(glow ? 0.5 : 0.2),
+                    color: accentColor.opacity(glow ? 0.5 : 0.2),
                     radius: glow ? 20 : 10,
                     x: 0,
                     y: 0
@@ -172,8 +232,8 @@ struct TimerView: View {
                     .stroke(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                themeColor.color.opacity(0.8),
-                                themeColor.color.opacity(0.4)
+                                accentColor.opacity(0.8),
+                                accentColor.opacity(0.4)
                             ]),
                             startPoint: .top,
                             endPoint: .bottom
@@ -228,7 +288,7 @@ struct TimerView: View {
             ControlButton(
                 title: timerManager.state == .running ? "Pause" : "Start",
                 icon: timerManager.state == .running ? "pause.fill" : "play.fill",
-                color: timerManager.state == .running ? .orange : themeColor.color,
+                color: timerManager.state == .running ? .orange : accentColor,
                 action: {
                     withAnimation(.spring(response: 0.3)) {
                         if timerManager.state == .running {
@@ -260,7 +320,7 @@ struct TimerView: View {
             ForEach(0..<4) { index in
                 Circle()
                     .fill(index < (timerManager.completedSessions % 4) ?
-                          themeColor.color :
+                          accentColor :
                           Color.gray.opacity(0.2))
                     .frame(width: 12, height: 12)
                     .scaleEffect(index == (timerManager.completedSessions % 4) ? 1.2 : 1)
