@@ -22,7 +22,7 @@ struct HelpView: View {
                     Text("Help")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                    Text("How to use this app")
+                    Text("How to use Tempo")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -52,7 +52,7 @@ struct HelpView: View {
                         HelpItem(
                             number: "4",
                             title: "Customize your Sessions",
-                            description: "Use different session presets like 'Deep Work' or 'Quick' and choose whether to auto-start breaks and focus sessions."
+                            description: "Fully customize Tempo such as break durations and auto-start breaks."
                         )
                     }
                 }

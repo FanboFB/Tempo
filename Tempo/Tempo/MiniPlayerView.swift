@@ -37,14 +37,9 @@ struct MiniPlayerView: View {
     // MARK: - View Components
     private var sessionInfo: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(timerManager.mode.rawValue)
+            Text("Session: \(timerManager.currentSessionName.isEmpty ? "Focus" : timerManager.currentSessionName)")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            if !timerManager.currentSessionName.isEmpty {
-                Text(timerManager.currentSessionName)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
         }
     }
     

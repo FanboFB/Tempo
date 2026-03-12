@@ -105,12 +105,6 @@ struct TimerView: View {
                     }
                 }
             }
-            
-            Divider()
-            
-            Button("Custom...") {
-                showingSessionPicker = true
-            }
         } label: {
             HStack(spacing: 6) {
                 Circle()

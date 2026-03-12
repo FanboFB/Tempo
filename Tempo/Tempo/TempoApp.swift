@@ -85,7 +85,7 @@ struct TempoApp: App {
         }
         
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 80),
+            contentRect: NSRect(x: 0, y: 0, width: 360, height: 80),
             styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
             backing: .buffered,
             defer: false
