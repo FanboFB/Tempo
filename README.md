@@ -16,7 +16,7 @@ A typical pomodoro (Italian for "tomato") technique consists of a **25 min** foc
 
 ### Update Alerts:
 - Starting from v1.2.1, every time a new release comes out, you can simply check for updates in the app using the Check Updates button in Settings.
-- You will still need to manually download the .dmg file from this repo, though, since an paid Apple Developer account is needed.
+- You will still need to manually download the .dmg file from this repo, though, since a paid Apple Developer account is needed.
 
 **If you find this project useful, please star this repository⭐️❤️**
 
