@@ -1,6 +1,6 @@
 # Tempo
 
-![Version](https://img.shields.io/badge/Version-1.2.0-red.svg) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
+![Version](https://img.shields.io/badge/Version-1.2.1-red.svg) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
 
 A focus timer for students. Level up your work with a customizable systematic focus routine, focus statistics, and more!
 
@@ -12,40 +12,11 @@ A typical pomodoro (Italian for "tomato") technique consists of a **25 min** foc
 
 ---
 
-## What's New in v1.2.0
+## What's New in v1.2.1 minor update
 
-### Bug Fixes
-- Fixed issues with timer persistence and state recovery
-- Improved notification reliability
-- Various stability improvements
-
-### Session Presets
-Choose from predefined session presets or customize your own:
-- **Focus** - Standard 25 min focus with 5 min breaks
-- **Deep Work** - Extended 50 min focus for intensive tasks
-- **Quick** - Fast 15 min sessions for short bursts
-
-<img width="332" alt="Focus Timer" src="https://github.com/user-attachments/assets/b0ba9d01-44d5-4886-b8aa-86590b9a542b" />
-<img width="332" alt="Deep Work Timer" src="https://github.com/user-attachments/assets/733697d0-c8c0-4b82-b7e6-fb5b3920ca59" />
-<img width="332" alt="Quick Timer" src="https://github.com/user-attachments/assets/ebca5323-5c32-4dee-879b-10329ea1ff11" />
-
-### Mini Player
-- Floating mini player for quick timer control
-- Always accessible timer status
-- Compact mode for minimal screen usage
-
-<img width="330" alt="Focus Mini Player" src="https://github.com/user-attachments/assets/88913cdf-6251-4575-a7db-626fb7bc166e" />
-<img width="330" alt="Deep Work Mini Player" src="https://github.com/user-attachments/assets/f6cd895b-5341-4862-b69c-98772a496c15" />
-<img width="330" alt="Quick Mini Player" src="https://github.com/user-attachments/assets/4491cdde-0ae8-4adc-a6da-e9d25e2bbcdb" />
-
-### Modifier Combos
-- Keyboard shortcuts for all major actions
-- Quick access to start, pause, skip, and stop
-- Level up your workflow with keyboard-first controls
-
-### Other
-- Comprehensive help page with tips and ways to use Tempo
-- Changed app icon
+### Update Alerts:
+- Starting from v1.2.1, every time a new release comes out, you can simply check for updates in the app using the Check Updates button in Settings.
+- You will still need to manually download the .dmg file from this repo, though, since an paid Apple Developer account is needed.
 
 **If you find this project useful, please star this repository⭐️❤️**
 

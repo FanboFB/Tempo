@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var timerManager: TimerManager
+    @ObservedObject private var updateManager = UpdateManager.shared
     var onResetSettings: (() -> Void)?
     
     @AppStorage("focusDuration") private var focusDuration = 25
@@ -14,6 +15,9 @@ struct SettingsView: View {
     @AppStorage("enableSounds") private var enableSounds = true
     
     @AppStorage("themeColor") private var themeColor = "red"
+    
+    @State private var showingResetConfirmation = false
+    @State private var showingUpdateAlert = false
     
     private var accentColor: Color {
         switch themeColor {
@@ -33,8 +37,6 @@ struct SettingsView: View {
         ("orange", "Orange", Color.orange),
         ("purple", "Purple", Color.purple),
     ]
-    
-    @State private var showingResetConfirmation = false
     
     var body: some View {
         ScrollView {
@@ -149,6 +151,29 @@ struct SettingsView: View {
                 SettingsSection(title: "About", icon: "info.circle.fill", accentColor: accentColor) {
                     VStack(spacing: 16) {
                         Button(action: {
+                            updateManager.checkForUpdates()
+                            showingUpdateAlert = true
+                        }) {
+                            HStack {
+                                Image(systemName: "arrow.down.circle")
+                                    .foregroundColor(accentColor)
+                                Text("Check for Updates")
+                                    .foregroundColor(accentColor)
+                                Spacer()
+                                if updateManager.isChecking {
+                                    ProgressView()
+                                        .scaleEffect(0.7)
+                                }
+                            }
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
+                            .background(accentColor.opacity(0.1))
+                            .cornerRadius(10)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .disabled(updateManager.isChecking)
+                        
+                        Button(action: {
                             showingResetConfirmation = true
                         }) {
                             HStack {
@@ -166,7 +191,7 @@ struct SettingsView: View {
                         .buttonStyle(PlainButtonStyle())
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Tempo v1.2.0")
+                            Text("Tempo v1.2.1")
                                 .font(.caption)
                                 .fontWeight(.medium)
                         }
@@ -188,6 +213,26 @@ struct SettingsView: View {
             }
         } message: {
             Text("This will delete all your statistics and reset settings to defaults. This action cannot be undone.")
+        }
+        .alert("Check for Updates", isPresented: $showingUpdateAlert) {
+            if updateManager.updateAvailable {
+                Button("Download Update") {
+                    updateManager.openDownloadPage()
+                }
+                Button("Later", role: .cancel) { }
+            } else if updateManager.errorMessage != nil {
+                Button("OK", role: .cancel) { }
+            } else {
+                Button("OK", role: .cancel) { }
+            }
+        } message: {
+            if updateManager.updateAvailable {
+                Text("Version \(updateManager.latestVersion) is available. You are currently using version \(updateManager.currentVersion).")
+            } else if let error = updateManager.errorMessage {
+                Text("Failed to check for updates: \(error)")
+            } else {
+                Text("You are using the latest version.")
+            }
         }
     }
     

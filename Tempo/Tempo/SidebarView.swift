@@ -148,7 +148,7 @@ struct SidebarView: View {
                 .frame(width: 6, height: 6)
                 .shadow(color: accentColor.opacity(0.5), radius: 2)
             
-            Text("v1.2.0")
+            Text("v1.2.1")
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(.secondary)
             
