@@ -152,7 +152,6 @@ struct SettingsView: View {
                     VStack(spacing: 16) {
                         Button(action: {
                             updateManager.checkForUpdates()
-                            showingUpdateAlert = true
                         }) {
                             HStack {
                                 Image(systemName: "arrow.down.circle")
@@ -191,7 +190,7 @@ struct SettingsView: View {
                         .buttonStyle(PlainButtonStyle())
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Tempo v1.2.1")
+                            Text("Tempo v1.2.2")
                                 .font(.caption)
                                 .fontWeight(.medium)
                         }
@@ -206,6 +205,11 @@ struct SettingsView: View {
             .padding(.horizontal)
         }
         .background(Color(.windowBackgroundColor))
+        .onChange(of: updateManager.isChecking) { _, newValue in
+            if !newValue {
+                showingUpdateAlert = true
+            }
+        }
         .alert("Reset All Data?", isPresented: $showingResetConfirmation) {
             Button("Cancel", role: .cancel) { }
             Button("Reset", role: .destructive) {
