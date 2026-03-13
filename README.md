@@ -1,6 +1,6 @@
 # Tempo
 
-![Version](https://img.shields.io/badge/Version-1.2.1-red.svg) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
+![Version](https://img.shields.io/badge/Version-1.2.2-red.svg) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
 
 A focus timer for students. Level up your work with a customizable systematic focus routine, focus statistics, and more!
 
@@ -12,11 +12,11 @@ A typical pomodoro (Italian for "tomato") technique consists of a **25 min** foc
 
 ---
 
-## What's New in v1.2.1 minor update
+## What's New in v1.2.2 minor update
 
-### Update Alerts:
-- Starting from v1.2.1, every time a new release comes out, you can simply check for updates in the app using the Check Updates button in Settings.
-- You will still need to manually download the .dmg file from this repo, though, since a paid Apple Developer account is needed.
+### Bug Fix
+
+Fixed a bug where the update manager wasn't working properly. 
 
 **If you find this project useful, please star this repository⭐️❤️**
 
