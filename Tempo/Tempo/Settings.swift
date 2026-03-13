@@ -138,6 +138,21 @@ final class SettingsStore: ObservableObject {
         set { defaults.set(newValue, forKey: "weeklyData") }
     }
     
+    var todos: [TodoItem] {
+        get {
+            guard let data = defaults.data(forKey: "todos"),
+                  let todos = try? JSONDecoder().decode([TodoItem].self, from: data) else {
+                return []
+            }
+            return todos
+        }
+        set {
+            if let data = try? JSONEncoder().encode(newValue) {
+                defaults.set(data, forKey: "todos")
+            }
+        }
+    }
+    
     private init() {}
 }
 
@@ -196,6 +211,21 @@ struct SessionType: Identifiable, Codable, Hashable {
         SessionType(name: "Deep Work", focusDuration: 50, shortBreakDuration: 10, longBreakDuration: 30, colorHex: "blue"),
         SessionType(name: "Quick", focusDuration: 15, shortBreakDuration: 3, longBreakDuration: 10, colorHex: "green"),
     ]
+}
+
+// MARK: - Todo Item
+struct TodoItem: Identifiable, Codable, Hashable {
+    var id: UUID
+    var title: String
+    var isCompleted: Bool
+    var createdAt: Date
+    
+    init(id: UUID = UUID(), title: String, isCompleted: Bool = false) {
+        self.id = id
+        self.title = title
+        self.isCompleted = isCompleted
+        self.createdAt = Date()
+    }
 }
 
 // MARK: - Timer State Data

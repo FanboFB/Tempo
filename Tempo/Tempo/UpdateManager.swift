@@ -38,7 +38,7 @@ final class UpdateManager: ObservableObject {
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
         request.setValue("Tempo/1.0", forHTTPHeaderField: "User-Agent")
         
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+        URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
             DispatchQueue.main.async {
                 self?.isChecking = false
                 

@@ -54,6 +54,11 @@ struct TempoApp: App {
     }
     
     private func handleKeyEvent(_ event: NSEvent) {
+        // Don't handle keys when a text field is focused
+        if isTextFieldFocused() {
+            return
+        }
+        
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
         
         switch event.keyCode {
@@ -66,6 +71,20 @@ struct TempoApp: App {
         default:
             break
         }
+    }
+    
+    private func isTextFieldFocused() -> Bool {
+        guard let window = NSApp.windows.first(where: { $0.isKeyWindow }) else {
+            return false
+        }
+        let firstResponder = window.firstResponder
+        if firstResponder is NSTextField || firstResponder is NSTextView {
+            return true
+        }
+        if let fieldEditor = window.fieldEditor(false, for: nil), fieldEditor.isEditable {
+            return true
+        }
+        return false
     }
     
     private func setupNotificationObservers() {
