@@ -1,6 +1,6 @@
 # Tempo
 
-![Version](https://img.shields.io/badge/Version-1.2.2-red.svg) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
+![Version](https://img.shields.io/badge/Version-1.2.3-red.svg) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
 
 A focus timer for students. Level up your work with a customizable systematic focus routine, focus statistics, and more!
 
@@ -12,11 +12,14 @@ A typical pomodoro (Italian for "tomato") technique consists of a **25 min** foc
 
 ---
 
-## What's New in v1.2.2 minor update
+## What's New in v1.2.3 update
 
-### Bug Fix
+### New Features
 
-Fixed a bug where the update manager wasn't working properly. 
+- **Theme Color Lock** - New setting to keep your preferred theme color when switching between different session types (Focus, Deep Work, Quick)
+- **Zen Music** - Ambient "Inner Peace" music by "Grand_Projet" (Pixabay) plays automatically during focus sessions (toggle in Settings)
+- **Todo List** - Added todo list support in sidebar. You an add, edit, delete, and mark done todo items.
+- **Help & About** - Redesigned help section with comprehensive guides and credits
 
 **If you find this project useful, please star this repository⭐️❤️**
 
