@@ -20,31 +20,33 @@ struct ContentView: View {
             
             mainContentView
         }
-        .navigationTitle("Tempo")
-        .accentColor(.blue)
     }
     
     @ViewBuilder
     private var mainContentView: some View {
-        ZStack {
-            Color(.windowBackgroundColor)
-                .ignoresSafeArea()
-            
-            Group {
-                switch selectedTab {
-                case 0:
-                    TimerView(timerManager: timerManager)
-                case 1:
-                    StatsView(timerManager: timerManager)
-                case 2:
-                    SettingsView(timerManager: timerManager, onResetSettings: resetSettings)
-                case 3:
-                    HelpView()
-                default:
-                    TimerView(timerManager: timerManager)
+        GeometryReader { geometry in
+            ZStack {
+                Color(.windowBackgroundColor)
+                    .ignoresSafeArea()
+                
+                Group {
+                    switch selectedTab {
+                    case 0:
+                        TimerView(timerManager: timerManager)
+                    case 1:
+                        StatsView(timerManager: timerManager)
+                    case 2:
+                        SettingsView(timerManager: timerManager, onResetSettings: resetSettings)
+                    case 3:
+                        HelpView()
+                    default:
+                        TimerView(timerManager: timerManager)
+                    }
                 }
+                .padding(.top, 1)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
     
@@ -57,6 +59,7 @@ struct ContentView: View {
         settings.enableNotifications = true
         settings.enableSounds = true
         settings.themeColor = "red"
+        settings.enableZenMusic = false
     }
 }
 

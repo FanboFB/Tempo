@@ -6,6 +6,7 @@ import SwiftUI
 import Combine
 import AudioToolbox
 import UserNotifications
+import AVFoundation
 
 // MARK: - Settings Keys
 // Centralized keys for UserDefaults storage to avoid typos
@@ -16,11 +17,11 @@ enum SettingsKeys {
     }
     
     enum Behavior: String, CaseIterable {
-        case enableNotifications, enableSounds
+        case enableNotifications, enableSounds, enableZenMusic
     }
     
     enum Appearance: String, CaseIterable {
-        case themeColor, selectedTab
+        case themeColor, overrideThemeColor, selectedTab
     }
     
     enum Session: String, CaseIterable {
@@ -80,10 +81,20 @@ final class SettingsStore: ObservableObject {
         set { defaults.set(newValue, forKey: "enableSounds") }
     }
     
+    var enableZenMusic: Bool {
+        get { defaults.object(forKey: "enableZenMusic") as? Bool ?? false }
+        set { defaults.set(newValue, forKey: "enableZenMusic") }
+    }
+    
     // MARK: Appearance Settings
     var themeColor: String {
         get { defaults.string(forKey: "themeColor") ?? "red" }
         set { defaults.set(newValue, forKey: "themeColor") }
+    }
+    
+    var overrideThemeColor: Bool {
+        get { defaults.object(forKey: "overrideThemeColor") as? Bool ?? false }
+        set { defaults.set(newValue, forKey: "overrideThemeColor") }
     }
     
     var selectedTab: Int {
@@ -399,7 +410,10 @@ class TimerManager: ObservableObject {
         settings.focusDuration = session.focusDuration
         settings.shortBreakDuration = session.shortBreakDuration
         settings.longBreakDuration = session.longBreakDuration
-        settings.themeColor = session.colorHex
+        
+        if !settings.overrideThemeColor {
+            settings.themeColor = session.colorHex
+        }
         
         if state == .stopped {
             resetTimer()
@@ -628,4 +642,69 @@ class TimerManager: ObservableObject {
     private func resetTimerState() {
         UserDefaults.standard.removeObject(forKey: "savedTimerState")
     }
+}
+
+// MARK: - Zen Music Player
+final class ZenMusicPlayer: ObservableObject {
+    static let shared = ZenMusicPlayer()
+    
+    @Published var isPlaying: Bool = false
+    @Published var isLoading: Bool = false
+    
+    private var player: AVPlayer?
+    private var playerItem: AVPlayerItem?
+    private var settings: SettingsStore { SettingsStore.shared }
+    
+    private init() {}
+    
+    func toggle() {
+        if isPlaying {
+            stop()
+        } else {
+            play()
+        }
+    }
+    
+    func play() {
+        guard !isPlaying else { return }
+        
+        isLoading = true
+        
+        guard let url = Bundle.main.url(forResource: "inner_peace", withExtension: "mp3") else {
+            print("Failed to find inner_peace.mp3 in bundle")
+            isLoading = false
+            return
+        }
+        
+        playerItem = AVPlayerItem(url: url)
+        player = AVPlayer(playerItem: playerItem)
+        player?.volume = 0.5
+        
+        NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: playerItem,
+            queue: .main
+        ) { [weak self] _ in
+            self?.player?.seek(to: .zero)
+            self?.player?.play()
+        }
+        
+        player?.play()
+        isPlaying = true
+        isLoading = false
+    }
+    
+    func stop() {
+        player?.pause()
+        player = nil
+        playerItem = nil
+        isPlaying = false
+        isLoading = false
+    }
+    
+    func getCurrentStationName() -> String {
+        return "Inner Peace"
+    }
+    
+    func nextStation() {}
 }

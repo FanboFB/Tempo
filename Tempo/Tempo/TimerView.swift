@@ -7,6 +7,9 @@ struct TimerView: View {
     @AppStorage("focusDuration") private var focusDuration = 25
     @AppStorage("shortBreakDuration") private var shortBreakDuration = 5
     @AppStorage("longBreakDuration") private var longBreakDuration = 15
+    @AppStorage("enableZenMusic") private var enableZenMusic = false
+    
+    @StateObject private var zenPlayer = ZenMusicPlayer.shared
     
     @State private var pulsate = false
     @State private var glow = false
@@ -33,7 +36,7 @@ struct TimerView: View {
         VStack(spacing: 0) {
             // Session selector
             sessionSelector
-                .padding(.top, 20)
+                .padding(.top, 30)
             
             // Mode header with transition animation
             modeHeader
@@ -47,6 +50,8 @@ struct TimerView: View {
             // Control buttons with animations
             controlButtons
                 .padding(.horizontal, 30)
+            
+            zenMusicControl
             
             Spacer()
             
@@ -306,6 +311,48 @@ struct TimerView: View {
                 color: .green,
                 action: { timerManager.skip() }
             )
+        }
+    }
+    
+    @ViewBuilder
+    private var zenMusicControl: some View {
+        if enableZenMusic {
+            HStack(spacing: 12) {
+                Button(action: {
+                    zenPlayer.toggle()
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: zenPlayer.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                            .font(.system(size: 18))
+                        
+                        Text(zenPlayer.isPlaying ? "Inner Peace" : "Play Zen Music")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(zenPlayer.isPlaying ? accentColor : .secondary)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 14)
+                    .background(
+                        Capsule()
+                            .fill(zenPlayer.isPlaying ? accentColor.opacity(0.15) : Color.gray.opacity(0.1))
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.top, 16)
+            .onChange(of: timerManager.mode) { _, newMode in
+                if newMode == .focus && enableZenMusic && !zenPlayer.isPlaying {
+                    zenPlayer.play()
+                } else if newMode != .focus && zenPlayer.isPlaying {
+                    zenPlayer.stop()
+                }
+            }
+            .onChange(of: timerManager.state) { _, newState in
+                if newState == .running && enableZenMusic && timerManager.mode == .focus && !zenPlayer.isPlaying {
+                    zenPlayer.play()
+                } else if newState == .stopped && zenPlayer.isPlaying {
+                    zenPlayer.stop()
+                }
+            }
         }
     }
     

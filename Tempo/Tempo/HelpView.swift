@@ -19,7 +19,7 @@ struct HelpView: View {
             VStack(alignment: .leading, spacing: 30) {
                 // Header
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Help")
+                    Text("Help & About")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     Text("How to use Tempo")
@@ -27,32 +27,84 @@ struct HelpView: View {
                         .foregroundColor(.secondary)
                 }
                 .padding(.top, 20)
-                
-                // How to Use
-                HelpSection(title: "How to Use", icon: "questionmark.circle.fill") {
+
+            // How to Use
+            HelpSection(title: "Getting Started", icon: "questionmark.circle.fill") {
                     VStack(alignment: .leading, spacing: 16) {
                         HelpItem(
                             number: "1",
                             title: "Start a Focus Session",
-                            description: "Click the play button or press Space to begin your focus session (25 min)."
+                            description: "Click the play button in the center of the timer, or press the Space bar on your keyboard. The default focus duration is 25 minutes."
                         )
                         
                         HelpItem(
                             number: "2",
-                            title: "Take a Break",
-                            description: "When the focus session ends, a short break starts (5 min). After 4 focus sessions, you'll get a long break (15 min)."
+                            title: "Work Until the Timer Ends",
+                            description: "Focus on your task until the timer completes. Avoid distractions during this time for maximum productivity."
                         )
                         
                         HelpItem(
                             number: "3",
-                            title: "Track your Progress",
-                            description: "View your statistics to see your daily, weekly, and total focus time. Streaks help keep you motivated!"
+                            title: "Take a Break",
+                            description: "When the focus session ends, you'll automatically transition to a short break (5 minutes). After completing 4 focus sessions, you'll get a long break (15 minutes)."
                         )
                         
                         HelpItem(
                             number: "4",
-                            title: "Customize your Sessions",
-                            description: "Fully customize Tempo such as break durations and auto-start breaks."
+                            title: "Repeat the Cycle",
+                            description: "Continue alternating between focus sessions and breaks. Each set of 4 focus sessions earns you a longer break."
+                        )
+                    }
+                }
+                
+                // Customizing Tempo
+                HelpSection(title: "Customizing Your Sessions", icon: "slider.horizontal.3") {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HelpItem(
+                            number: "1",
+                            title: "Choose a Session Type",
+                            description: "Click the session selector dropdown to choose between Focus (25 min), Deep Work (50 min), or Quick (15 min) sessions."
+                        )
+                        
+                        HelpItem(
+                            number: "2",
+                            title: "Adjust Session Durations",
+                            description: "In Settings, you can customize focus duration (5-60 min), short break (1-15 min), and long break (5-30 min)."
+                        )
+                        
+                        HelpItem(
+                            number: "3",
+                            title: "Auto-Start Options",
+                            description: "Enable 'Auto-start breaks' to automatically begin breaks after focus sessions. Enable 'Auto-start focus' to begin the next focus session after a break."
+                        )
+                        
+                        HelpItem(
+                            number: "4",
+                            title: "Keep Your Theme Color",
+                            description: "In Settings, enable 'Keep theme color when switching sessions' to prevent the color from changing when you select different session types."
+                        )
+                    }
+                }
+                
+                // Zen Music
+                HelpSection(title: "Zen Music", icon: "music.note") {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HelpItem(
+                            number: "1",
+                            title: "Enable Zen Music",
+                            description: "Go to Settings and toggle 'Enable zen music during focus' to turn on ambient music during your focus sessions."
+                        )
+                        
+                        HelpItem(
+                            number: "2",
+                            title: "How It Works",
+                            description: "When enabled, zen music will automatically start when you begin a focus session and stop when you take a break or stop the timer. Just remember not to accidentally play it at full blast ;)"
+                        )
+                        
+                        HelpItem(
+                            number: "3",
+                            title: "Manual Control",
+                            description: "You can also manually play/pause the music using the control that appears below the timer."
                         )
                     }
                 }
@@ -60,19 +112,45 @@ struct HelpView: View {
                 // Keyboard Shortcuts
                 HelpSection(title: "Keyboard Shortcuts", icon: "keyboard.fill") {
                     VStack(spacing: 12) {
-                        ShortcutRow(keys: "Space", action: "Start/Pause timer")
-                        ShortcutRow(keys: "⌘+R", action: "Stop timer")
-                        ShortcutRow(keys: "⌘+S", action: "Skip to next session")
-                        ShortcutRow(keys: "⌘+M", action: "Open Mini Player")
+                        ShortcutRow(keys: "Space", action: "Start or pause the timer")
+                        ShortcutRow(keys: "⌘+R", action: "Stop and reset the timer")
+                        ShortcutRow(keys: "⌘+S", action: "Skip to the next session (focus/break)")
+                        ShortcutRow(keys: "⌘+M", action: "Open the Mini Player window")
                     }
                 }
                 
-                // Tips
-                HelpSection(title: "Tips", icon: "lightbulb.fill") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        TipItem(text: "Use the Mini Player for a compact timer that stays on top of other windows.")
-                        TipItem(text: "Customize your focus and break durations in Settings to match your workflow.")
-                        TipItem(text: "Enable auto-start options to seamlessly transition between focus sessions and breaks.")
+                // Credits
+                HelpSection(title: "Credits", icon: "heart.fill") {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Zen Music")
+                                .font(.system(size: 14, weight: .semibold))
+                            
+                            Text("The ambient music used in Tempo is \"Inner Peace\" by \"Grand_Project\" from Pixabay. Licensed under the Pixabay Content License - free for commercial use with no attribution required.")
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("App Icon")
+                                .font(.system(size: 14, weight: .semibold))
+                            
+                            Text("Created by Backtosq1.")
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Version")
+                                .font(.system(size: 14, weight: .semibold))
+                            
+                            Text("Tempo v1.2.3 - A focus timer app for macOS")
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
                 }
                 

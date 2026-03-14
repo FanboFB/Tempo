@@ -13,8 +13,10 @@ struct SettingsView: View {
     @AppStorage("autoStartFocus") private var autoStartFocus = false
     @AppStorage("enableNotifications") private var enableNotifications = true
     @AppStorage("enableSounds") private var enableSounds = true
+    @AppStorage("enableZenMusic") private var enableZenMusic = false
     
     @AppStorage("themeColor") private var themeColor = "red"
+    @AppStorage("overrideThemeColor") private var overrideThemeColor = false
     
     @State private var showingResetConfirmation = false
     @State private var showingUpdateAlert = false
@@ -114,10 +116,24 @@ struct SettingsView: View {
                         isOn: $enableSounds,
                         accentColor: accentColor
                     )
+                    
+                    ToggleRow(
+                        icon: "music.note",
+                        label: "Enable zen music during focus",
+                        isOn: $enableZenMusic,
+                        accentColor: accentColor
+                    )
                 }
                 
                 // Appearance
                 SettingsSection(title: "Appearance", icon: "paintbrush.fill", accentColor: accentColor) {
+                    ToggleRow(
+                        icon: "lock.fill",
+                        label: "Keep theme color when switching sessions",
+                        isOn: $overrideThemeColor,
+                        accentColor: accentColor
+                    )
+                    
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Theme Color")
                             .font(.system(size: 14, weight: .medium))
@@ -190,7 +206,7 @@ struct SettingsView: View {
                         .buttonStyle(PlainButtonStyle())
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Tempo v1.2.2")
+                            Text("Tempo v1.2.3")
                                 .font(.caption)
                                 .fontWeight(.medium)
                         }
