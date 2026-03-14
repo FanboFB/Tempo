@@ -13,15 +13,13 @@ struct TempoApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(timerManager)
-                .frame(width: 650, height: 700)
-                .focusable()
+                .frame(minWidth: 650, minHeight: 700)
                 .onAppear {
                     setupKeyMonitors()
                     setupNotificationObservers()
                 }
         }
         .windowStyle(.hiddenTitleBar)
-        .windowResizability(.contentSize)
         .commands {
             SidebarCommands()
             CommandGroup(replacing: .newItem) { }
