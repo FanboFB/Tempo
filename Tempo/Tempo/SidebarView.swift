@@ -266,6 +266,7 @@ struct SidebarView: View {
                             .foregroundColor(.secondary)
                         
                         Picker("", selection: $newTodoMinutes) {
+                            Text("None").tag(0)
                             Text("15m").tag(15)
                             Text("25m").tag(25)
                             Text("30m").tag(30)
@@ -627,6 +628,7 @@ struct TodoRow: View {
                     get: { editingMinutes },
                     set: { onEditingMinutesChange($0) }
                 )) {
+                    Text("None").tag(0)
                     Text("15m").tag(15)
                     Text("25m").tag(25)
                     Text("30m").tag(30)

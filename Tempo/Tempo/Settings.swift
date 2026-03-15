@@ -108,6 +108,11 @@ final class SettingsStore: ObservableObject {
         set { defaults.set(newValue, forKey: "currentSessionName") }
     }
     
+    var autoNameSessionFromTask: Bool {
+        get { defaults.bool(forKey: "autoNameSessionFromTask") }
+        set { defaults.set(newValue, forKey: "autoNameSessionFromTask") }
+    }
+    
     var customSessions: [SessionType] {
         get {
             guard let data = defaults.data(forKey: "customSessions"),
@@ -181,10 +186,17 @@ final class SettingsStore: ObservableObject {
         todos.filter { $0.isCompleted }
     }
     
+    var tasksNeedingFocus: [TodoItem] {
+        activeTasks.filter { $0.requiredMinutes > 0 }
+    }
+    
     var currentTask: TodoItem? {
-        let active = activeTasks
-        guard !active.isEmpty else { return nil }
-        return active.first
+        let focusTasks = tasksNeedingFocus
+        guard !focusTasks.isEmpty else { return nil }
+        if currentTaskIndex >= focusTasks.count {
+            currentTaskIndex = 0
+        }
+        return focusTasks.first
     }
     
     func setCurrentTaskIndex(to taskId: UUID) {
@@ -301,6 +313,9 @@ struct TodoItem: Identifiable, Codable, Hashable {
     }
     
     var requiredTimeText: String {
+        if requiredMinutes == 0 {
+            return "None"
+        }
         if requiredMinutes >= 60 {
             let hours = requiredMinutes / 60
             let mins = requiredMinutes % 60
@@ -436,6 +451,10 @@ class TimerManager: ObservableObject {
     
     private func loadCurrentTask() {
         currentTask = settings.currentTask
+        if settings.autoNameSessionFromTask, let task = currentTask {
+            currentSessionName = task.title
+            settings.currentSessionName = task.title
+        }
     }
     
     func refreshCurrentTask() {
@@ -508,8 +527,13 @@ class TimerManager: ObservableObject {
     }
     
     func setSession(_ session: SessionType) {
-        currentSessionName = session.name
-        settings.currentSessionName = session.name
+        if settings.autoNameSessionFromTask, let task = settings.currentTask {
+            currentSessionName = task.title
+            settings.currentSessionName = task.title
+        } else {
+            currentSessionName = session.name
+            settings.currentSessionName = session.name
+        }
         settings.focusDuration = session.focusDuration
         settings.shortBreakDuration = session.shortBreakDuration
         settings.longBreakDuration = session.longBreakDuration
