@@ -164,6 +164,64 @@ final class SettingsStore: ObservableObject {
         }
     }
     
+    func deleteCompletedTasks() {
+        todos = todos.filter { !$0.isCompleted }
+    }
+    
+    var currentTaskIndex: Int {
+        get { defaults.integer(forKey: "currentTaskIndex") }
+        set { defaults.set(newValue, forKey: "currentTaskIndex") }
+    }
+    
+    var activeTasks: [TodoItem] {
+        todos.filter { !$0.isCompleted }
+    }
+    
+    var completedTasks: [TodoItem] {
+        todos.filter { $0.isCompleted }
+    }
+    
+    var currentTask: TodoItem? {
+        let active = activeTasks
+        guard !active.isEmpty else { return nil }
+        return active.first
+    }
+    
+    func setCurrentTaskIndex(to taskId: UUID) {
+        let active = activeTasks
+        if let index = active.firstIndex(where: { $0.id == taskId }) {
+            currentTaskIndex = index
+        }
+    }
+    
+    var totalTaskMinutes: Int {
+        activeTasks.reduce(0) { $0 + $1.requiredMinutes }
+    }
+    
+    var totalTaskTimeText: String {
+        let total = totalTaskMinutes
+        if total >= 60 {
+            let hours = total / 60
+            let mins = total % 60
+            if mins > 0 {
+                return "\(hours)h \(mins)m"
+            }
+            return "\(hours)h"
+        }
+        return "\(total)m"
+    }
+    
+    func advanceToNextTask() {
+        let active = activeTasks
+        if currentTaskIndex < active.count - 1 {
+            currentTaskIndex += 1
+        }
+    }
+    
+    func resetTaskIndex() {
+        currentTaskIndex = 0
+    }
+    
     private init() {}
 }
 
@@ -230,12 +288,28 @@ struct TodoItem: Identifiable, Codable, Hashable {
     var title: String
     var isCompleted: Bool
     var createdAt: Date
+    var requiredMinutes: Int
+    var sessionId: UUID?
     
-    init(id: UUID = UUID(), title: String, isCompleted: Bool = false) {
+    init(id: UUID = UUID(), title: String, isCompleted: Bool = false, requiredMinutes: Int = 25, sessionId: UUID? = nil) {
         self.id = id
         self.title = title
         self.isCompleted = isCompleted
         self.createdAt = Date()
+        self.requiredMinutes = requiredMinutes
+        self.sessionId = sessionId
+    }
+    
+    var requiredTimeText: String {
+        if requiredMinutes >= 60 {
+            let hours = requiredMinutes / 60
+            let mins = requiredMinutes % 60
+            if mins > 0 {
+                return "\(hours)h \(mins)m"
+            }
+            return "\(hours)h"
+        }
+        return "\(requiredMinutes)m"
     }
 }
 
@@ -301,6 +375,7 @@ class TimerManager: ObservableObject {
     @Published var completedSessions: Int = 0
     @Published var currentSessionName: String = ""
     @Published var availableSessions: [SessionType] = SessionType.defaultSessions
+    @Published var currentTask: TodoItem?
     
     // MARK: - Private Properties
     private let settings = SettingsStore.shared
@@ -348,6 +423,34 @@ class TimerManager: ObservableObject {
         
         checkAndResetDailyCounter()
         loadWeeklyData()
+        loadCurrentTask()
+        
+        NotificationCenter.default.addObserver(
+            forName: .tasksDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.loadCurrentTask()
+        }
+    }
+    
+    private func loadCurrentTask() {
+        currentTask = settings.currentTask
+    }
+    
+    func refreshCurrentTask() {
+        loadCurrentTask()
+    }
+    
+    func markCurrentTaskCompleted() {
+        guard let task = currentTask else { return }
+        var todos = settings.todos
+        if let index = todos.firstIndex(where: { $0.id == task.id }) {
+            todos[index].isCompleted = true
+            settings.todos = todos
+            settings.advanceToNextTask()
+            loadCurrentTask()
+        }
     }
     
     // MARK: - Public Methods
@@ -473,6 +576,9 @@ class TimerManager: ObservableObject {
                 addToWeeklyData(time: elapsedTime)
             }
             
+            // Mark current task as completed if user chose to do so
+            markCurrentTaskCompleted()
+            
             updateLastSessionDate()
             
             // Determine break type (long break every 4 sessions)
@@ -505,6 +611,7 @@ class TimerManager: ObservableObject {
         startTime = nil
         saveTimerState()
         playNotificationSound()
+        loadCurrentTask()
     }
     
     private func resetTimer() {
